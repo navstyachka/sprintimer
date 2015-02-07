@@ -1,1 +1,26 @@
-hello world
+%h1
+  Sprintimer
+
+.container
+  %input.minutes{value: 50, 'data-timer' => 1}
+  %span first interval
+  %br
+  %br
+  %br
+  %input.minutes{value: 10, 'data-timer' => 2}
+  %span second interval
+  %i.delete= "[X]"
+  %br
+  %br
+  %br
+  TOTAL TIME:
+  %span{'data-total' => 0} 0
+  %br
+  %br
+  %br
+  %button{'data-add-interval' => true} Add one more interval
+  %br
+  %br
+  %br
+  %button{'data-save-timer' => true} Save this timer
+  %span for next time ;)
