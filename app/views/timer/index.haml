@@ -1,15 +1,19 @@
 %h1
   Sprintimer
 
-.container
-  %input.minutes{value: 50, 'data-timer' => 1}
-  %span first interval
-  %br
-  %br
-  %br
-  %input.minutes{value: 10, 'data-timer' => 2}
-  %span second interval
-  %i.delete= "[X]"
+.container{'timer-app' => true}
+  .timer-section-container{'data-interval-sections' => true}
+    .timer-section{'data-timer' => 1}
+      %input.minutes{value: 50, 'data-timer-input' => true}
+      %span minutes interval
+    %br
+    %br
+    %br
+
+    .timer-section{'data-timer' => 2}
+      %input.minutes{value: 10, 'data-timer-input' => true}
+      %span minutes interval
+      %i.delete{'data-delete-interval' => true}= "[X]"
   %br
   %br
   %br
