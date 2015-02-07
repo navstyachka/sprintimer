@@ -23,7 +23,6 @@ class App.TimersController
     @timer.each -> new App.Timer(@)
 
     @addButton.on 'click', =>
-      console.log 'added'
       @addInterval()
 
     deleteInterval = =>
