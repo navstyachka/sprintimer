@@ -1,7 +1,3 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://coffeescript.org/
-
 App = {}
 
 $ ->
@@ -10,23 +6,21 @@ $ ->
 class App.TimerApp
   constructor: (el)->
     @el = $(el)
-    new App.TimersController($('[data-interval-sections]', @el))
+    new App.IntervalsController($('[data-interval-sections]', @el))
+    @timer = new App.Timer(@el)
 
-class App.TimersController
+class App.IntervalsController
   constructor: (el)->
     @el = el
     @addButton = $('[data-add-interval]')
-    @timer = $('[data-timer]', @el)
+    @timer = $('[data-interval]', @el)
     @index = @timer.size() + 1
-
-    # init first timers
-    @timer.each -> new App.Timer(@)
 
     @addButton.on 'click', =>
       @addInterval()
 
     deleteInterval = =>
-      $('[data-timer]', @el).on 'click', '[data-delete-interval]', (e)=>
+      $('[data-interval]', @el).on 'click', '[data-delete-interval]', (e)=>
         @removeInterval $(e.target)
 
     deleteInterval()
@@ -50,17 +44,65 @@ class App.TimersController
     $(document).trigger 'action:addedInterval'
 
   removeInterval: (el)=>
-    el.parents('[data-timer]').remove()
+    el.parents('[data-interval]').remove()
 
 
 class App.Timer
+  TIMER_ACTION_START: 'timer:started'
+  TIMER_ACTION_PAUSE: 'timer:paused'
+  TIMER_ACTION_UNPAUSE: 'timer:unpaused'
+  TIMER_ACTION_CLEAR: 'timer:cleared'
+
   constructor: (el)->
     @el = $(el)
-    console.info 'inited Timer class'
+    @startTimerBtn = $('[data-start-timer]', @el)
+    @pauseTimerBtn = $('[data-pause-timer]', @el)
+    @clearTimerBtn = $('[data-clear-timer]', @el)
+
+    @gatherIntervals()
+
+    @startTimerBtn.on 'click', =>
+      if @paused
+        @unpauseTimer()
+      else
+        @startTimer()
+    @pauseTimerBtn.on 'click', =>
+      @pauseTimer()
+    @clearTimerBtn.on 'click', =>
+      @clearTimer()
 
   startTimer: =>
+    $(document).trigger @TIMER_ACTION_START
     console.info 'start timer'
+    time = @intervals[0]
 
-  stopTimer: =>
-    console.info 'stop timer'
+    @timer = setInterval((->
+      time--
+      console.log time
+      return
+    ), 1000)
+
+
+  clearTimer: =>
+    console.info 'stop and clear timer'
+    clearInterval @timer
+    $(document).trigger @TIMER_ACTION_CLEAR
+
+  pauseTimer: =>
+    @paused = true
+    $(document).trigger @TIMER_ACTION_PAUSE
+    console.info 'pause timer'
+
+  unpauseTimer: =>
+    @paused = false
+    console.info 'unpause timer'
+    $(document).trigger @TIMER_ACTION_UNPAUSE
+
+  gatherIntervals: =>
+    @clearTimer()
+    intervals = []
+    $('[data-interval-input]', @el).each ->
+      intervals.push parseInt($(@).val()) * 60000
+    @intervals = intervals
+
 

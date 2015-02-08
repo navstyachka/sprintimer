@@ -3,17 +3,23 @@
 
 .container{'timer-app' => true}
   .timer-section-container{'data-interval-sections' => true}
-    .timer-section{'data-timer' => 1}
-      %input.minutes{value: 50, 'data-timer-input' => true}
+    .timer-section{'data-interval' => 1}
+      %input.minutes{value: 50, 'data-interval-input' => true}
       %span minutes interval
     %br
     %br
     %br
 
-    .timer-section{'data-timer' => 2}
-      %input.minutes{value: 10, 'data-timer-input' => true}
+    .timer-section{'data-interval' => 2}
+      %input.minutes{value: 10, 'data-interval-input' => true}
       %span minutes interval
       %i.delete{'data-delete-interval' => true}= "[X]"
+  .timer-ctrls
+    %button{'data-start-timer' => true} START
+    %button{'data-pause-timer' => true} PAUSE
+    %br
+    %button{'data-clear-timer' => true} CLEAR ALL INTERVALS
+    %br
   %br
   %br
   %br
