@@ -55,6 +55,7 @@ class App.Timer
 
   constructor: (el)->
     @el = $(el)
+    @tickerView = $('[data-timer-ticker]', @el)
     @startTimerBtn = $('[data-start-timer]', @el)
     @pauseTimerBtn = $('[data-pause-timer]', @el)
     @clearTimerBtn = $('[data-clear-timer]', @el)
@@ -63,8 +64,9 @@ class App.Timer
 
     @startTimerBtn.on 'click', =>
       if @paused
-        @unpauseTimer()
+        @startTimer()
       else
+        @gatherIntervals()
         @startTimer()
     @pauseTimerBtn.on 'click', =>
       @pauseTimer()
@@ -73,23 +75,33 @@ class App.Timer
 
   startTimer: =>
     $(document).trigger @TIMER_ACTION_START
-    console.info 'start timer'
-    time = @intervals[0]
 
-    @timer = setInterval((->
-      time--
-      console.log time
-      return
+    @timer = setInterval((=>
+      if @currentInterval == 0
+        @changeInterval()
+
+      @currentInterval--
+      @viewTick()
     ), 1000)
 
+  changeInterval: =>
+    @intervals.push @intervals.shift()
+    @currentInterval = @intervals[0]
+    console.info "Next interval is #{@currentInterval}"
+
+  viewTick: =>
+    minutes = Math.round(@currentInterval / 60000) - 1
+    if !@seconds then @seconds = 60
+    @seconds--
+    @tickerView.html "#{minutes} : #{@seconds}"
 
   clearTimer: =>
-    console.info 'stop and clear timer'
     clearInterval @timer
     $(document).trigger @TIMER_ACTION_CLEAR
 
   pauseTimer: =>
     @paused = true
+    clearInterval @timer
     $(document).trigger @TIMER_ACTION_PAUSE
     console.info 'pause timer'
 
@@ -104,5 +116,6 @@ class App.Timer
     $('[data-interval-input]', @el).each ->
       intervals.push parseInt($(@).val()) * 60000
     @intervals = intervals
+    @currentInterval = @intervals[0]
 
 
