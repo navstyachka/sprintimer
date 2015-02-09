@@ -10,6 +10,7 @@ class App.TimerApp
     @timer = new App.Timer(@el)
 
 class App.IntervalsController
+  INTERVAL_CHANGED: 'interval:changed'
   constructor: (el)->
     @el = el
     @addButton = $('[data-add-interval]')
@@ -25,7 +26,7 @@ class App.IntervalsController
 
     deleteInterval()
 
-    $(document).on 'action:addedInterval', =>
+    $(document).on @INTERVAL_CHANGED, =>
       deleteInterval()
 
 
@@ -41,10 +42,11 @@ class App.IntervalsController
   addInterval: =>
     @el.append @createTimerView()
     @index += 1
-    $(document).trigger 'action:addedInterval'
+    $(document).trigger @INTERVAL_CHANGED
 
   removeInterval: (el)=>
     el.parents('[data-interval]').remove()
+    $(document).trigger @INTERVAL_CHANGED
 
 
 class App.Timer
@@ -61,6 +63,10 @@ class App.Timer
     @clearTimerBtn = $('[data-clear-timer]', @el)
 
     @gatherIntervals()
+
+    $(document).on App.IntervalsController.INTERVAL_CHANGED
+      # clear timer
+      #TODO: clarinteval
 
     @startTimerBtn.on 'click', =>
       if @paused
