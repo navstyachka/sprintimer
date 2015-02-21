@@ -21,7 +21,7 @@ class App.IntervalsController
       @addInterval()
 
     deleteInterval = =>
-      $('[data-interval]', @el).on 'click', '[data-delete-interval]', (e)=>
+      @el.on 'click', '[data-delete-interval]', (e)=>
         @removeInterval $(e.target)
 
     deleteInterval()
@@ -51,8 +51,6 @@ class App.IntervalsController
 
 class App.Timer
   TIMER_ACTION_START: 'timer:started'
-  TIMER_ACTION_PAUSE: 'timer:paused'
-  TIMER_ACTION_UNPAUSE: 'timer:unpaused'
   TIMER_ACTION_CLEAR: 'timer:cleared'
 
   constructor: (el)->
@@ -64,9 +62,11 @@ class App.Timer
 
     @gatherIntervals()
 
-    $(document).on App.IntervalsController.INTERVAL_CHANGED
-      # clear timer
-      #TODO: clarinteval
+    $(document).on App.IntervalsController.INTERVAL_CHANGED, =>
+      @clearTimer()
+
+    @clearTimerBtn.on 'click', =>
+      @clearTimer()
 
     @startTimerBtn.on 'click', =>
       if @paused
@@ -74,14 +74,11 @@ class App.Timer
       else
         @gatherIntervals()
         @startTimer()
+
     @pauseTimerBtn.on 'click', =>
       @pauseTimer()
-    @clearTimerBtn.on 'click', =>
-      @clearTimer()
 
   startTimer: =>
-    $(document).trigger @TIMER_ACTION_START
-
     @timer = setInterval((=>
       if @currentInterval == 0
         @changeInterval()
@@ -96,31 +93,27 @@ class App.Timer
     console.info "Next interval is #{@currentInterval}"
 
   viewTick: =>
-    minutes = Math.round(@currentInterval / 60000) - 1
+    minutes = Math.round(@currentInterval / 60) - 1
     if !@seconds then @seconds = 60
     @seconds--
-    @tickerView.html "#{minutes} : #{@seconds}"
+    @tickerView.html "#{minutes} : #{@seconds} (#{@currentInterval})"
 
   clearTimer: =>
     clearInterval @timer
-    $(document).trigger @TIMER_ACTION_CLEAR
+    @tickerView.html "00:00 #{@currentInterval}"
 
   pauseTimer: =>
     @paused = true
     clearInterval @timer
-    $(document).trigger @TIMER_ACTION_PAUSE
-    console.info 'pause timer'
 
   unpauseTimer: =>
     @paused = false
-    console.info 'unpause timer'
-    $(document).trigger @TIMER_ACTION_UNPAUSE
 
   gatherIntervals: =>
     @clearTimer()
     intervals = []
     $('[data-interval-input]', @el).each ->
-      intervals.push parseInt($(@).val()) * 60000
+      intervals.push parseInt($(@).val()) * 60
     @intervals = intervals
     @currentInterval = @intervals[0]
 
